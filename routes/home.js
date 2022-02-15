@@ -49,11 +49,11 @@ router.get("/", async (req, res, next) => {
         { model: Answer, required: false },
       ],
       order: [["upvote", "DESC"]],
-      limit: 2,
+      limit: 5,
     });
     const topUsers = await User.findAll({
       order: [["number_of_answers", "DESC"]],
-      limit: 2,
+      limit: 10,
     });
     res.status(200).json({
       status: "Home page successfully fetched",

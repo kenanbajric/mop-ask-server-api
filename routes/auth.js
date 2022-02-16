@@ -33,7 +33,11 @@ router.get("/", async (req, res) => {
 
 // User Signup
 router.post("/signup", async (req, res, next) => {
+  console.log(req.body);
   try {
+    //Checking if user already exist
+    //
+
     // Crypting password
     const hashedPw = await bcrypt.hash(req.body.password, 12);
     const results = await User.create({
@@ -42,12 +46,14 @@ router.post("/signup", async (req, res, next) => {
       email: req.body.email,
       password: hashedPw,
     });
-    res.status(201).json({
-      status: "User saved to database",
-      data: {
-        results: results,
-      },
-    });
+    res
+      .status(201)
+      .json({
+        status: "User saved to database",
+        data: {
+          results: results,
+        },
+      })
   } catch (err) {
     next(err);
   }

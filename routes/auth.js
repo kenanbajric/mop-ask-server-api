@@ -46,14 +46,12 @@ router.post("/signup", async (req, res, next) => {
       email: req.body.email,
       password: hashedPw,
     });
-    res
-      .status(201)
-      .json({
-        status: "User saved to database",
-        data: {
-          results: results,
-        },
-      })
+    res.status(201).json({
+      status: "User saved to database",
+      data: {
+        results: results,
+      },
+    });
   } catch (err) {
     next(err);
   }
@@ -82,8 +80,11 @@ router.post("/login", async (req, res, next) => {
       { expiresIn: "5h" }
     );
     res.status(200).json({
-      status: "User logged in.",
-      token: token,
+      data: {
+        status: "User logged in.",
+        token: token,
+        userId: user.id
+      },
     });
   } catch (err) {
     next(err);

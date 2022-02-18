@@ -69,7 +69,43 @@ router.get("/", async (req, res, next) => {
 });
 
 // Load more
-//
+router.get("/loadmore", async (req, res, next) => {
+  // Simulating a slower API response
+  for (let i = 0; i < 100000000; i++) {
+    1+1;
+  }
+  // End of simulation
+
+  try {
+    const loadedQuestions = await Question.findAll({
+      include: [
+        {
+          model: User,
+          required: false,
+          attributes: [
+            "id",
+            "first_name",
+            "last_name",
+            "email",
+            "number_of_answers",
+          ],
+        },
+        { model: Answer, required: false },
+      ],
+      order: [["createdAt", "DESC"]],
+      limit: req.query.limit,
+      offset: req.query.skip,
+    });
+    res.status(200).json({
+      status: "Successfully loaded more question",
+      data: {
+        loadedQuestions: loadedQuestions,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+});
 
 // "My Question Page" - Fetch latest 20 users question
 router.get("/my-questions", isAuth, async (req, res, next) => {

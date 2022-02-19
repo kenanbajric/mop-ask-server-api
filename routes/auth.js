@@ -29,8 +29,6 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Fetch one user
-
 // User Signup
 router.post("/signup", async (req, res, next) => {
   console.log(req.body);
@@ -50,6 +48,26 @@ router.post("/signup", async (req, res, next) => {
       status: "User saved to database",
       data: {
         results: results,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Update profile information
+router.put("/my-profile", isAuth, async (req, res, next) => {
+  try {
+    const user = await User.findOne({ where: { id: req.userId } });
+    await user.update({
+      first_name: req.body.firstName,
+      last_name: req.body.lastName,
+      email: req.body.email
+    });
+    res.status(200).json({
+      status: "Profile information updated!",
+      data: {
+        user: user,
       },
     });
   } catch (err) {
@@ -83,7 +101,7 @@ router.post("/login", async (req, res, next) => {
       data: {
         status: "User logged in.",
         token: token,
-        userId: user.id
+        userId: user.id,
       },
     });
   } catch (err) {
@@ -105,12 +123,15 @@ router.put("/updatepw", isAuth, async (req, res, next) => {
       throw next(error);
     }
     await user.update({ password: newHashedPw });
-    res.status(201).json({ message: "Password updated!" });
+    res.status(201).json({
+      data: {
+        message: "Password updated!",
+        statusCode: 201,
+      },
+    });
   } catch (err) {
     next(err);
   }
 });
-
-// Delete a user
 
 module.exports = router;

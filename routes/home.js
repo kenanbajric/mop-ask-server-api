@@ -72,7 +72,7 @@ router.get("/", async (req, res, next) => {
 router.get("/loadmore", async (req, res, next) => {
   // Simulating a slower API response
   for (let i = 0; i < 100000000; i++) {
-    1+1;
+    1 + 1;
   }
   // End of simulation
 
@@ -107,26 +107,6 @@ router.get("/loadmore", async (req, res, next) => {
   }
 });
 
-// "My Question Page" - Fetch latest 20 users question
-router.get("/my-questions", isAuth, async (req, res, next) => {
-  try {
-    const myQuestion = await Question.findAll({
-      where: {
-        userId: req.userId,
-      },
-    });
-    res.status(200).json({
-      status: "My Questions page successfully fetched",
-      data: {
-        results: myQuestion.length,
-        questions: myQuestion,
-      },
-    });
-  } catch (err) {
-    next(err);
-  }
-});
-
 // "Profile Page"
 router.get("/my-profile", isAuth, async (req, res, next) => {
   try {
@@ -142,9 +122,6 @@ router.get("/my-profile", isAuth, async (req, res, next) => {
   }
 });
 
-// Update profile information
-router.post("/my-profile", isAuth, async (req, res, next) => {
-  //
-});
+
 
 module.exports = router;

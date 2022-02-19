@@ -49,6 +49,26 @@ router.get("/", async (req, res, next) => {
   }
 });
 
+// "My Question Page"
+router.get("/my-questions", isAuth, async (req, res, next) => {
+  try {
+    const myQuestion = await Question.findAll({
+      where: {
+        userId: req.userId,
+      },
+    });
+    res.status(200).json({
+      status: "My Questions page successfully fetched",
+      data: {
+        results: myQuestion.length,
+        latestQuestions: myQuestion,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // Fetch one questions
 router.get("/:id", async (req, res, next) => {
   try {

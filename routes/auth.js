@@ -92,9 +92,9 @@ router.post("/login", async (req, res, next) => {
 });
 
 // Update a password
-router.post("/updatepw", isAuth, async (req, res, next) => {
+router.put("/updatepw", isAuth, async (req, res, next) => {
+  console.log("User ID is: " + req.userId);
   try {
-    console.log("User ID is: " + req.userId);
     const user = await User.findOne({ where: { id: req.userId } });
     const newHashedPw = await bcrypt.hash(req.body.newPw, 12);
     const isEqual = await bcrypt.compare(req.body.oldPw, user.password);

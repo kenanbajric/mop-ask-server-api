@@ -73,11 +73,14 @@ router.get("/:id", async (req, res, next) => {
 // Post an answer
 router.post("/:id", isAuth, async (req, res, next) => {
   try {
+    const user = await User.findOne({ where: { id: req.userId } });
     const results = await Answer.create({
       answer_text: req.body.answerText,
       userId: req.userId,
       questionId: req.params.id,
     });
+    user.number_of_answers += 1;
+    user.save();
     res.status(201).json({
       status: "Answer saved to database",
       data: {

@@ -8,6 +8,7 @@ const db = require("../db");
 const Question = require("../models/question");
 const User = require("../models/user");
 const Answer = require("../models/answer");
+const Notification = require("../models/notification");
 
 // Router
 const router = express.Router();
@@ -73,18 +74,30 @@ router.get("/my-questions", isAuth, async (req, res, next) => {
 });
 
 // Fetch one questions
-router.get("/:id", async (req, res, next) => {
+router.get("/single/:id", async (req, res, next) => {
   try {
-    const question = await Question.findOne({ where: { id: req.params.id } });
-    const user = await User.findOne({
-      where: { id: question.userId },
-      attributes: ["id", "first_name", "last_name", "number_of_answers"],
+    const question = await Question.findOne({
+      where: { id: req.params.id },
+
+      include: [
+        {
+          model: User,
+          required: false,
+          attributes: [
+            "id",
+            "first_name",
+            "last_name",
+            "email",
+            "number_of_answers",
+          ],
+        },
+        { model: Answer, required: false },
+      ],
     });
     res.status(200).json({
       status: "A question successfully fetched",
       data: {
         question: question,
-        user: user,
       },
     });
   } catch (err) {
@@ -150,6 +163,17 @@ router.post("/:id", isAuth, async (req, res, next) => {
     const results = await Answer.create({
       answer_text: req.body.answerText,
       userId: req.userId,
+      questionId: req.params.id,
+    });
+    const question = await Question.findOne({
+      where: {
+        id: req.params.id,
+      },
+    });
+    Notification.create({
+      question_title: question.question_title,
+      answer_text: req.body.answerText,
+      userId: question.userId,
       questionId: req.params.id,
     });
     user.number_of_answers += 1;

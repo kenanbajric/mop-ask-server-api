@@ -9,25 +9,10 @@ const db = require("../db");
 
 // Models
 const User = require("../models/user");
+const Notification = require("../models/notification");
 
 // Router
 const router = express.Router();
-
-// Fetch all users
-router.get("/", async (req, res) => {
-  try {
-    const results = await User.findAll();
-    res.status(200).json({
-      status: "All users successfully fetched",
-      data: {
-        results: results.length,
-        users: results,
-      },
-    });
-  } catch (err) {
-    next(err);
-  }
-});
 
 // User Signup
 router.post("/signup", async (req, res, next) => {
@@ -62,7 +47,7 @@ router.put("/my-profile", isAuth, async (req, res, next) => {
     await user.update({
       first_name: req.body.firstName,
       last_name: req.body.lastName,
-      email: req.body.email
+      email: req.body.email,
     });
     res.status(200).json({
       status: "Profile information updated!",
@@ -127,6 +112,45 @@ router.put("/updatepw", isAuth, async (req, res, next) => {
       data: {
         message: "Password updated!",
         statusCode: 201,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Fetch notifications
+router.get("/notifications", isAuth, async (req, res, next) => {
+  try {
+    const notifications = await Notification.findAll({
+      where: { userId: +req.userId, isNew: true },
+    });
+    res.status(200).json({
+      status: "All users successfully fetched",
+      data: {
+        notifications: notifications,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Notification opened
+router.put("/notifications/:id", isAuth, async (req, res, next) => {
+  try {
+    const notification = await Notification.findOne({
+      where: { id: +req.params.id },
+    });
+
+    notification.isNew = false;
+
+    console.log(notification);
+    await notification.save();
+    res.status(200).json({
+      status: "Notification has been read",
+      data: {
+        notification: notification,
       },
     });
   } catch (err) {

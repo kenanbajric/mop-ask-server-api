@@ -7,6 +7,7 @@ const morgan = require("morgan");
 const User = require("./models/user");
 const Question = require("./models/question");
 const Answer = require("./models/answer");
+const Notification = require("./models/notification");
 
 const app = express();
 
@@ -26,7 +27,10 @@ app.use((req, res, next) => {
     "Access-Control-Allow-Methods",
     "GET, POST, PUT, PATCH, DELETE, OPTIONS"
   );
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization, userId"
+  );
   next();
 });
 
@@ -49,6 +53,9 @@ Question.belongsTo(User, { onDelete: "NO ACTION" });
 User.hasMany(Answer, { onDelete: "NO ACTION" });
 Question.hasMany(Answer, { onDelete: "NO ACTION" });
 Answer.belongsTo(Question, { onDelete: "NO ACTION" });
+User.hasMany(Notification, { onDelete: "NO ACTION" });
+Notification.belongsTo(User, { onDelete: "NO ACTION" });
+Notification.belongsTo(Question, { onDelete: "NO ACTION" });
 
 // Sequlize sync function
 sequelize

@@ -8,6 +8,7 @@ const db = require("../db");
 const Question = require("../models/question");
 const User = require("../models/user");
 const Answer = require("../models/answer");
+const Notification = require("../models/notification");
 
 // Router
 const router = express.Router();
@@ -15,6 +16,12 @@ const router = express.Router();
 // "Home Page" - Fetch last 20 questions & Fetch top 10 most upvoted questions & Fetch top 5 users with most answers
 router.get("/", async (req, res, next) => {
   try {
+    let notifications;
+    if (req.get("userId") !== undefined && req.get("userId") !== null) {
+      notifications = await Notification.findAll({
+        where: { userId: +req.get("userId") || 0, isNew: true },
+      });
+    }
     const latestQuestions = await Question.findAll({
       include: [
         {
@@ -61,6 +68,7 @@ router.get("/", async (req, res, next) => {
         latestQuestions: latestQuestions,
         hotQuestions: hotQuestions,
         topUsers: topUsers,
+        notifications: notifications,
       },
     });
   } catch (err) {
@@ -121,7 +129,5 @@ router.get("/my-profile", isAuth, async (req, res, next) => {
     next(err);
   }
 });
-
-
 
 module.exports = router;
